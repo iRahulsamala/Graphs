@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+  <head>
+	<title>Graph Creator</title>
+	<style>
+	  body {
+		font-family: Arial, sans-serif;
+		background-color: #f0f0f0;
+		height: 600vh;
+	  }
+
+	 h1{
+		color: #003f73;
+		text-align: left;
+		font-size: 20px;
+	  }
+	  h2{
+		color: #003f73;
+	  }
+	  #l2{
+		margin-top: -45px;
+		margin-left: 180px;
+		color: #003f73;
+	  }
+	  #l3{
+		margin-left: 460px;
+		color: #003f73;
+	  }
+	  #inputValue,#maxValue{
+		background-color: #c2e3ff;
+	  }
+
+	  .container {
+		max-width: 800px;
+		margin: 0 auto;
+		padding: 20px;
+		background-color: #ffffff;
+	  }
+
+	  .graph {
+		width: 50px;
+		height: 300px;
+		margin: 20px auto;
+		background-color: #c2e3ff;
+		position: relative;
+		margin-left: 0px;
+	  }
+
+	  .bar {
+		position: absolute;
+		bottom: 0;
+		left: 0;
+		width: 50px;
+		background-color: #008cff;
+		color: #f0f0f0;
+	  }
+
+	  canvas {
+		display: block;
+		margin-top: 0px;
+		border: 1px solid #003f73;
+		background-color: #c2e3ff;
+	  }
+	  #pieChart{
+		display: block;
+		margin-top: -320px;
+		margin-left: 80px;
+		border: 1px solid #003f73;
+		background-color: #c2e3ff;
+		
+	  }
+	 #gradientGraph {
+	   display: block;
+	   margin-top: -370px;
+	   margin-left: 420px;
+	   border: 1px solid #003f73;
+	   background-color: #c2e3ff;
+	 
+	 }
+	</style>
+  </head>
+  <body>
+	<div class="container">
+	  <!-- <h1>Graph Creator</h1> -->
+	  <h1>Enter Value:</h1>
+	  <input type="number" id="inputValue" placeholder="Input Value" />
+	  <input type="number" id="maxValue" placeholder="Max Value" />
+	  <button onclick="createGraph()">Create Graph</button>
+	  <h2>Graphs:</h2>
+	  <div class="graph">
+		<div class="bar"> </div>
+	  </div>
+	  <canvas id="pieChart" width="300" height="300"></canvas>
+	  <h2>Level-1</h2>
+	  <h2 id="l2">Level-2</h2>
+	  <canvas id="gradientGraph" width="150" height="300"></canvas>
+	  <h2 id="l3">Level-3</h2>
+	</div>
+	<script>
+		
+	  function createGraph()
+	  {
+		const inputValue = parseInt(document.getElementById("inputValue").value);
+		const maxValue = parseInt(document.getElementById("maxValue").value);
+		const errorDiv = document.createElement("div");
+		errorDiv.classList.add("error");
+
+		if (isNaN(inputValue) || isNaN(maxValue)) {
+		  errorDiv.textContent = "Please enter valid values";
+		  document.body.appendChild(errorDiv);
+		  setTimeout(() => {
+			errorDiv.remove();
+		  }, 3000);
+		  return;
+		}
+
+		if (inputValue > maxValue) {
+		  errorDiv.textContent = "Input value is greater than max value";
+		  document.body.appendChild(errorDiv);
+		  setTimeout(() => {
+			errorDiv.remove();
+		  }, 3000);
+		  return;
+		}
+
+		// Create bar chart
+		const percentage = Math.floor((inputValue / maxValue) * 100);
+		const bar = document.querySelector(".bar");
+		bar.style.height = `${percentage}%`;
+		bar.innerHTML = `${percentage}%`;
+
+		// Create pie chart
+		const pieChartCanvas = document.getElementById("pieChart");
+		const ctx = pieChartCanvas.getContext("2d");
+		const center = { x: pieChartCanvas.width / 2, y: pieChartCanvas.height / 2 };
+		const radius = Math.min(center.x, center.y) - 10;
+		const startAngle = 0;
+		const endAngle = (percentage * Math.PI) / 50;
+
+	ctx.clearRect(0, 0, pieChartCanvas.width, pieChartCanvas.height);
+	
+	ctx.beginPath();
+	ctx.moveTo(center.x, center.y);
+	ctx.arc(center.x, center.y, radius, startAngle, endAngle, false);
+	ctx.closePath();
+	ctx.fillStyle = "#FFFFFF";
+	ctx.fill();
+	
+	ctx.beginPath();
+	ctx.moveTo(center.x, center.y);
+	ctx.arc(center.x, center.y, radius, endAngle, startAngle, true);
+	ctx.closePath();
+	ctx.fillStyle = "#008cff";
+	ctx.fill();
+	
+	ctx.font = "bold 20px Arial";
+	ctx.fillStyle = "#FFFFFF";
+	ctx.textAlign = "center";
+	ctx.textBaseline = "middle";
+	ctx.fillText(`${percentage}%`, center.x, center.y);
+
+		//// Create gradient graph
+		const gradientGraphCanvas = document.getElementById("gradientGraph");
+		const gradientCtx = gradientGraphCanvas.getContext("2d");
+		const barHeight = (gradientGraphCanvas.height * percentage) / 100;
+		const gradient = gradientCtx.createLinearGradient(0, 0, 0, gradientGraphCanvas.height);
+		
+		gradient.addColorStop(0, "#C2E3FF");
+		gradient.addColorStop(1, "#008cff");
+		
+		gradientCtx.fillStyle = gradient;
+		gradientCtx.fillRect(0, gradientGraphCanvas.height - barHeight, gradientGraphCanvas.width, barHeight);
+		gradientCtx.font = "bold 20px Arial ";
+		gradientCtx.fillStyle = "#FFFFFF";
+		gradientCtx.textAlign = "center";
+		gradientCtx.textBaseline = "middle";
+		gradientCtx.fillText(`${percentage}%`, gradientGraphCanvas.width / 2, gradientGraphCanvas.height - barHeight / 2);
+		
+		  window.onload = () => {
+			createGraph();
+		  };
+	  }
+	</script>
+  </body>
+</html>
